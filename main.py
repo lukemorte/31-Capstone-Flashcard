@@ -18,7 +18,12 @@ def load_csv():
     data_file = pandas.read_csv("./data/english_words.csv")
 
     global word_data
-    word_data = [{"english": value["English"], "czech": value["Czech"]} for key, value in data_file.iterrows()]
+
+    # ruční způsob
+    # word_data = [{"english": value["English"], "czech": value["Czech"]} for key, value in data_file.iterrows()]
+
+    # pandas způsob
+    word_data = pandas.DataFrame.to_dict(data_file, orient="records")
 
 
 def get_random_word():
@@ -27,7 +32,7 @@ def get_random_word():
 
 
 def show_random_word():
-    random_word = get_random_word()["english"]
+    random_word = get_random_word()["English"]
     canvas.itemconfig(big_word, text=random_word)
 
 
