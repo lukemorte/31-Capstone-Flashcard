@@ -22,7 +22,12 @@ card_back_img = None
 
 
 def load_csv():
-    data_file = pandas.read_csv("./data/english_words.csv")
+    try:
+        data_file = pandas.read_csv('./data/words_to_learn.csv')
+    except FileNotFoundError:
+        print("File words_to_learn.csv doesn't exist.")
+        print("Opening original file english_words.csv")
+        data_file = pandas.read_csv("./data/english_words.csv")
 
     global lang, trans_lang, to_learn
     lang = data_file.columns[0]
@@ -61,6 +66,13 @@ def flip_card():
     canvas.itemconfig(small_word, text=trans_lang, fill="white")
     canvas.itemconfig(canvas_image, image=card_back_img)
 
+
+def word_guessed():
+    print(f"Word {active_row["English"]} is known.")
+    to_learn.remove(active_row)
+    pandas.DataFrame(to_learn).to_csv("./data/words_to_learn.csv", index=False)
+    show_random_word()
+
 def update_card():
     show_random_word()
 
@@ -88,7 +100,7 @@ unknown_button = Button(image=cross_image, highlightthickness=0, relief="flat", 
 unknown_button.grid(column=0, row=1)
 
 check_image = PhotoImage(file="./images/right.png")
-known_button = Button(image=check_image, highlightthickness=0, relief="flat", borderwidth=0, activebackground=BACKGROUND_COLOR, command=update_card)
+known_button = Button(image=check_image, highlightthickness=0, relief="flat", borderwidth=0, activebackground=BACKGROUND_COLOR, command=word_guessed)
 known_button.grid(column=1, row=1)
 
 # load CSV data
