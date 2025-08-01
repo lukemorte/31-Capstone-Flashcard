@@ -12,14 +12,21 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 lang = None
+trans_lang = None
 to_learn = []
+active_row = None
+timer = None
+
+card_front_img = None
+card_back_img = None
 
 
 def load_csv():
     data_file = pandas.read_csv("./data/english_words.csv")
 
-    global lang, to_learn
+    global lang, trans_lang, to_learn
     lang = data_file.columns[0]
+    trans_lang = data_file.columns[1]
 
     # ruční způsob
     # word_data = [{"english": value["English"], "czech": value["Czech"]} for key, value in data_file.iterrows()]
@@ -34,10 +41,23 @@ def get_random_word():
 
 
 def show_random_word():
-    random_word = get_random_word()[lang]
-    canvas.itemconfig(big_word, text=random_word)
-    canvas.itemconfig(small_word, text=lang)
+    global active_row
+    active_row = get_random_word()
 
+    random_word = active_row[lang]
+    canvas.itemconfig(big_word, text=random_word, fill="black")
+    canvas.itemconfig(small_word, text=lang, fill="black")
+    canvas.itemconfig(canvas_image, image=card_front_img)
+
+    global timer
+    timer = window.after(3000, flip_card)
+
+
+def flip_card():
+    trans_word = active_row[trans_lang]
+    canvas.itemconfig(big_word, text=trans_word, fill="white")
+    canvas.itemconfig(small_word, text=trans_lang, fill="white")
+    canvas.itemconfig(canvas_image, image=card_back_img)
 
 def update_card():
     show_random_word()
@@ -55,7 +75,8 @@ window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
 
 canvas = Canvas(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, background=BACKGROUND_COLOR, highlightthickness=0)
 card_front_img = PhotoImage(file="./images/card_front.png")
-canvas.create_image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, image=card_front_img)
+card_back_img = PhotoImage(file="./images/card_back.png")
+canvas_image = canvas.create_image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, image=card_front_img)
 small_word = canvas.create_text(SCREEN_WIDTH / 2, 150, text="Title", font=("Arial", 30, "italic"))
 big_word = canvas.create_text(SCREEN_WIDTH / 2, 250, text="word", font=("Arial", 60, "bold"))
 canvas.grid(column=0, row=0, columnspan=2)
@@ -69,9 +90,12 @@ known_button = Button(image=check_image, highlightthickness=0, relief="flat", bo
 known_button.grid(column=1, row=1)
 
 # load CSV data
-
 load_csv()
+
+
 show_random_word()
+
+
 
 
 window.mainloop()
