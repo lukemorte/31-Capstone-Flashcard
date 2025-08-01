@@ -14,7 +14,7 @@ SCREEN_HEIGHT = 600
 lang = None
 trans_lang = None
 to_learn = []
-active_row = None
+active_row = {}
 timer = None
 
 card_front_img = None
@@ -50,7 +50,9 @@ def show_random_word():
     canvas.itemconfig(canvas_image, image=card_front_img)
 
     global timer
-    timer = window.after(3000, flip_card)
+    if timer:
+        window.after_cancel(timer)
+    timer = window.after(3000, func=flip_card)
 
 
 def flip_card():
