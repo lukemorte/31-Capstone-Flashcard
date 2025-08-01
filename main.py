@@ -11,29 +11,32 @@ BACKGROUND_COLOR = "#B1DDC6"
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-word_data = []
+lang = None
+to_learn = []
 
 
 def load_csv():
     data_file = pandas.read_csv("./data/english_words.csv")
 
-    global word_data
+    global lang, to_learn
+    lang = data_file.columns[0]
 
     # ruční způsob
     # word_data = [{"english": value["English"], "czech": value["Czech"]} for key, value in data_file.iterrows()]
 
     # pandas způsob
-    word_data = pandas.DataFrame.to_dict(data_file, orient="records")
+    to_learn = pandas.DataFrame.to_dict(data_file, orient="records")
 
 
 def get_random_word():
-    random_word = random.choice(word_data)
+    random_word = random.choice(to_learn)
     return random_word
 
 
 def show_random_word():
-    random_word = get_random_word()["English"]
+    random_word = get_random_word()[lang]
     canvas.itemconfig(big_word, text=random_word)
+    canvas.itemconfig(small_word, text=lang)
 
 
 def update_card():
@@ -53,7 +56,7 @@ window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
 canvas = Canvas(width=SCREEN_WIDTH, height=SCREEN_HEIGHT, background=BACKGROUND_COLOR, highlightthickness=0)
 card_front_img = PhotoImage(file="./images/card_front.png")
 canvas.create_image(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, image=card_front_img)
-canvas.create_text(SCREEN_WIDTH / 2, 150, text="Title", font=("Arial", 40, "italic"))
+small_word = canvas.create_text(SCREEN_WIDTH / 2, 150, text="Title", font=("Arial", 30, "italic"))
 big_word = canvas.create_text(SCREEN_WIDTH / 2, 250, text="word", font=("Arial", 60, "bold"))
 canvas.grid(column=0, row=0, columnspan=2)
 
